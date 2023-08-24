@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(storm LANGUAGES CXX)
 
+set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -fPIC -ggdb -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations")
 set(TARGET test)
 
 set(LIB_SRC

@@ -12,33 +12,6 @@
 namespace storm {
 
 class Logger;
-//日志事件
-class LogEvent
-{
-public:
-    typedef std::shared_ptr<LogEvent> ptr;
-    LogEvent(const char * file, uint32_t line, uint32_t elapse
-            , uint32_t thread_id, uint32_t fiber_id, uint64_t time);
-
-    const char * getFile() const {return m_file;}
-    uint32_t getLine() const {return m_line;}
-    uint32_t getElapse() const {return m_elapse;}
-    uint32_t getThreadId() const {return m_threadId;}
-    uint32_t getFiberId() const {return m_fiberId;}
-    uint64_t getTime() const {return m_time;}
-    const std::string getContent() const {return m_ss.str();}
-
-    std::stringstream &getSS() {return m_ss;}
-
-private:
-    const char * m_file = nullptr;
-    int32_t m_line = 0;
-    uint32_t m_elapse = 0;
-    uint32_t m_threadId = 0;
-    uint32_t m_fiberId = 0;
-    uint64_t m_time = 0;
-    std::stringstream m_ss;  
-};
 
 //日志级别
 class LogLevel
@@ -53,6 +26,42 @@ public:
         FATAL = 5
     };
     static const char * toString(LogLevel::Level level);
+};
+
+//日志事件
+class LogEvent
+{
+public:
+    typedef std::shared_ptr<LogEvent> ptr;
+    LogEvent(std::shared_ptr<Logger> logger, LogLevel::Level level
+        ,const char* file, int32_t line, uint32_t elapse
+        ,uint32_t thread_id, uint32_t fiber_id, uint64_t time
+        ,const std::string& thread_name);
+
+    const char * getFile() const {return m_file;}
+    uint32_t getLine() const {return m_line;}
+    uint32_t getElapse() const {return m_elapse;}
+    uint32_t getThreadId() const {return m_threadId;}
+    uint32_t getFiberId() const {return m_fiberId;}
+    uint64_t getTime() const {return m_time;}
+    const std::string& getThreadName() const { return m_threadName;}
+    const std::string getContent() const {return m_ss.str();}
+    std::shared_ptr<Logger> getLogger() const { return m_logger;}
+    LogLevel::Level getLevel() const { return m_level;}
+
+    std::stringstream &getSS() {return m_ss;}
+
+private:
+    const char * m_file = nullptr;
+    int32_t m_line = 0;
+    uint32_t m_elapse = 0;
+    uint32_t m_threadId = 0;
+    uint32_t m_fiberId = 0;
+    uint64_t m_time = 0;
+    std::string m_threadName;
+    std::stringstream m_ss;  
+    std::shared_ptr<Logger> m_logger;
+    LogLevel::Level m_level;
 };
 
 //日志格式器
@@ -92,8 +101,8 @@ public:
 
     void init();
 private:
-    std::string m_pattern;
     std::vector<FormatItem::ptr> m_items;
+    std::string m_pattern;
 };
 
 //日志输出器
@@ -131,7 +140,7 @@ private:
     std::string m_name;
     LogLevel::Level m_level;
     std::list<LogAppender::ptr> m_appenders;
-    LogFormatter::ptr m_formatter;
+    LogFormatter::ptr m_formatter_logger;
 };
 
 //输出到控制台
@@ -151,5 +160,7 @@ private:
     std::string m_filename;
     std::ofstream m_filestream;
 };
-}
+
+} // storm end
+
 #endif
